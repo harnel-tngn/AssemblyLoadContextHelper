@@ -1,4 +1,7 @@
-﻿namespace AssemblyLoadContextHelper.Tests;
+﻿using System;
+using System.Collections.Generic;
+
+namespace AssemblyLoadContextHelper.Tests;
 
 [TestType]
 internal class SimpleClass
