@@ -50,10 +50,10 @@ public static class AssemblyLoadContextExtension
         var matchedAssembly = context.GetMatchingAssembly(type.Assembly);
         var matchedType = matchedAssembly
             .GetTypes()
-            .SingleOrDefault(t => t.FullName == type.FullName);
+            .SingleOrDefault(t => t.AssemblyQualifiedName == type.AssemblyQualifiedName);
 
         if (matchedType == null)
-            throw new Exception($"Failed to find {type.FullName} in {context.Name}");
+            throw new Exception($"Failed to find {type.AssemblyQualifiedName} in {context.Name}");
 
         return matchedType;
     }
