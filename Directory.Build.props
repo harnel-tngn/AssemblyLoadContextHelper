@@ -6,5 +6,8 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <Authors>Harnel</Authors>
     <Company>Harnel</Company>
+    
+    <BaseIntermediateOutputPath>$(SolutionDir)obj\$(MSBuildProjectName)</BaseIntermediateOutputPath>
+    <OutputPath>$(SolutionDir)bin\$(MSBuildProjectName)</OutputPath>
   </PropertyGroup>
 </Project>
