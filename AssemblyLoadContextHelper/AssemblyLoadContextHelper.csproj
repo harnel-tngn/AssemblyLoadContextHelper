@@ -4,6 +4,16 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+
+    <PackageId>AssemblyLoadContextHelper</PackageId>
+    <Version>0.0.1</Version>
+    <Authors>Harnel</Authors>
+    <Company>Harnel</Company>
+    <Description>Helper library for AssemblyLoadContext and cross AssemblyLoadContext operations.</Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/harnel-tngn/AssemblyLoadContextHelper</RepositoryUrl>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
 
 </Project>
