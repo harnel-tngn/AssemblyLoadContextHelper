@@ -5,10 +5,16 @@ using System.Runtime.Loader;
 
 namespace AssemblyLoadContextHelper;
 
+/// <summary>
+/// Extension methods for AssemblyLoadContext.
+/// </summary>
 public static class AssemblyLoadContextExtension
 {
     private static Assembly CoreLibAsembly = typeof(int).Assembly;
 
+    /// <summary>
+    /// Returns assembly with same FullName from the given AssemblyLoadContext.
+    /// </summary>
     public static Assembly GetMatchingAssembly(this AssemblyLoadContext context, Assembly assembly)
     {
         // Note: System.Private.CoreLib is unable to load
@@ -25,6 +31,9 @@ public static class AssemblyLoadContextExtension
         return matchedAssembly;
     }
 
+    /// <summary>
+    /// Returns Type with same AssemblyQualifiedName from the given AssemblyLoadContext.
+    /// </summary>
     public static Type GetMatchingType(this AssemblyLoadContext context, Type type)
     {
         if (type.IsGenericType && !type.IsGenericTypeDefinition)
@@ -49,6 +58,9 @@ public static class AssemblyLoadContextExtension
         return matchedType;
     }
 
+    /// <summary>
+    /// Returns Method with same AssemblyQualifiedName from the given AssemblyLoadContext.
+    /// </summary>
     public static MethodInfo GetMatchingMethod(this AssemblyLoadContext context, MethodInfo methodInfo)
     {
         if (methodInfo.DeclaringType == null)
