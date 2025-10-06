@@ -1,12 +1,20 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Linq;
+using System.Reflection;
 using System.Runtime.Loader;
 
 namespace AssemblyLoadContextHelper;
 
+/// <summary>
+/// Extension methods for AssemblyLoadContext.
+/// </summary>
 public static class AssemblyLoadContextExtension
 {
     private static Assembly CoreLibAsembly = typeof(int).Assembly;
 
+    /// <summary>
+    /// Returns assembly with same FullName from the given AssemblyLoadContext.
+    /// </summary>
     public static Assembly GetMatchingAssembly(this AssemblyLoadContext context, Assembly assembly)
     {
         // Note: System.Private.CoreLib is unable to load
@@ -23,6 +31,9 @@ public static class AssemblyLoadContextExtension
         return matchedAssembly;
     }
 
+    /// <summary>
+    /// Returns Type with same AssemblyQualifiedName from the given AssemblyLoadContext.
+    /// </summary>
     public static Type GetMatchingType(this AssemblyLoadContext context, Type type)
     {
         if (type.IsGenericType && !type.IsGenericTypeDefinition)
@@ -39,14 +50,17 @@ public static class AssemblyLoadContextExtension
         var matchedAssembly = context.GetMatchingAssembly(type.Assembly);
         var matchedType = matchedAssembly
             .GetTypes()
-            .SingleOrDefault(t => t.FullName == type.FullName);
+            .SingleOrDefault(t => t.AssemblyQualifiedName == type.AssemblyQualifiedName);
 
         if (matchedType == null)
-            throw new Exception($"Failed to find {type.FullName} in {context.Name}");
+            throw new Exception($"Failed to find {type.AssemblyQualifiedName} in {context.Name}");
 
         return matchedType;
     }
 
+    /// <summary>
+    /// Returns Method with matching name, generic arguments, and parameter signatures from the given AssemblyLoadContext.
+    /// </summary>
     public static MethodInfo GetMatchingMethod(this AssemblyLoadContext context, MethodInfo methodInfo)
     {
         if (methodInfo.DeclaringType == null)
