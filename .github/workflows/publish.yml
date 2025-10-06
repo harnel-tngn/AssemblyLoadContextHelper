@@ -28,7 +28,7 @@ jobs:
 
     # Pack projects
     - name: .NET Pack
-      run: dotnet pack --configuration Release --output ./artifacts
+      run: dotnet pack --configuration Release --output ./artifacts -p:PackageVersion=0.0.${{github.run_number}}
       
     # Upload nuget package
     - name: Publish to NuGet
