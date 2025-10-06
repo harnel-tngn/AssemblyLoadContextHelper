@@ -59,7 +59,7 @@ public static class AssemblyLoadContextExtension
     }
 
     /// <summary>
-    /// Returns Method with same AssemblyQualifiedName from the given AssemblyLoadContext.
+    /// Returns Method with matching name, generic arguments, and parameter signatures from the given AssemblyLoadContext.
     /// </summary>
     public static MethodInfo GetMatchingMethod(this AssemblyLoadContext context, MethodInfo methodInfo)
     {
