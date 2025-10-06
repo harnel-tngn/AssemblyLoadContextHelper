@@ -15,7 +15,7 @@ public static class AssemblyLoadContextExtension
     /// <summary>
     /// Returns assembly with same FullName from the given AssemblyLoadContext.
     /// </summary>
-    public static Assembly GetMatchingAssembly(this AssemblyLoadContext context, Assembly assembly)
+    public static Assembly GetMatchingAssembly(this AssemblyLoadContext context, Assembly assembly, bool loadIfNotLoaded = false)
     {
         // Note: System.Private.CoreLib is unable to load
         if (assembly.FullName == CoreLibAsembly.FullName)
@@ -26,7 +26,17 @@ public static class AssemblyLoadContextExtension
             .FirstOrDefault(asm => asm.FullName == assembly.FullName);
 
         if (matchedAssembly == null)
+        {
+            if (loadIfNotLoaded)
+            {
+                if (assembly.IsDynamic)
+                    throw new Exception("Failed to load dynamic assembly");
+
+                return context.LoadFromAssemblyPath(assembly.Location);
+            }
+
             throw new Exception($"Failed to find {assembly.FullName} in {context.Name}");
+        }
 
         return matchedAssembly;
     }
@@ -34,20 +44,20 @@ public static class AssemblyLoadContextExtension
     /// <summary>
     /// Returns Type with same AssemblyQualifiedName from the given AssemblyLoadContext.
     /// </summary>
-    public static Type GetMatchingType(this AssemblyLoadContext context, Type type)
+    public static Type GetMatchingType(this AssemblyLoadContext context, Type type, bool loadIfNotLoaded = false)
     {
         if (type.IsGenericType && !type.IsGenericTypeDefinition)
         {
-            var matchedOpenType = context.GetMatchingType(type.GetGenericTypeDefinition());
+            var matchedOpenType = context.GetMatchingType(type.GetGenericTypeDefinition(), loadIfNotLoaded: loadIfNotLoaded);
             var typeArguments = type
                 .GetGenericArguments()
-                .Select(context.GetMatchingType)
+                .Select(type => context.GetMatchingType(type, loadIfNotLoaded: loadIfNotLoaded))
                 .ToArray();
 
             return matchedOpenType.MakeGenericType(typeArguments);
         }
 
-        var matchedAssembly = context.GetMatchingAssembly(type.Assembly);
+        var matchedAssembly = context.GetMatchingAssembly(type.Assembly, loadIfNotLoaded: loadIfNotLoaded);
         var matchedType = matchedAssembly
             .GetTypes()
             .SingleOrDefault(t => t.AssemblyQualifiedName == type.AssemblyQualifiedName);
@@ -61,23 +71,23 @@ public static class AssemblyLoadContextExtension
     /// <summary>
     /// Returns Method with matching name, generic arguments, and parameter signatures from the given AssemblyLoadContext.
     /// </summary>
-    public static MethodInfo GetMatchingMethod(this AssemblyLoadContext context, MethodInfo methodInfo)
+    public static MethodInfo GetMatchingMethod(this AssemblyLoadContext context, MethodInfo methodInfo, bool loadIfNotLoaded = false)
     {
         if (methodInfo.DeclaringType == null)
             throw new NotImplementedException("Declaring Type is null");
 
         if (methodInfo.IsGenericMethod && !methodInfo.IsGenericMethodDefinition)
         {
-            var matchedOpenMethodInfo = context.GetMatchingMethod(methodInfo.GetGenericMethodDefinition());
+            var matchedOpenMethodInfo = context.GetMatchingMethod(methodInfo.GetGenericMethodDefinition(), loadIfNotLoaded: loadIfNotLoaded);
             var typeArguments = methodInfo
                 .GetGenericArguments()
-                .Select(context.GetMatchingType)
+                .Select(type => context.GetMatchingType(type, loadIfNotLoaded: loadIfNotLoaded))
                 .ToArray();
 
             return matchedOpenMethodInfo.MakeGenericMethod(typeArguments);
         }
 
-        var matchedType = context.GetMatchingType(methodInfo.DeclaringType);
+        var matchedType = context.GetMatchingType(methodInfo.DeclaringType, loadIfNotLoaded: loadIfNotLoaded);
         var matchedMethodInfo = matchedType
             .GetMethods()
             .SingleOrDefault(mi =>
