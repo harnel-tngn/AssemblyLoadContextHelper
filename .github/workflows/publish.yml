@@ -34,10 +34,10 @@ jobs:
     - name: Execute unit tests
       run: dotnet test
 
+    # Pack projects
+    - name: .NET Pack
+      run: dotnet pack --configuration Release --output ./artifacts
+      
     # Upload nuget package
-    - name: Upload build artifacts
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: 8.0.x
-    - run: dotnet pack --configuration Release
-    - run: dotnet nuget push bin/AssemblyLoadContextHelper/*.nupkg --api-key ${{secrets.NUGET_API_KEY}} --source https://api.nuget.org/v3/index.json
+    - name: Publish to NuGet
+      run: dotnet nuget push ./artifacts/*.nupkg --api-key ${{secrets.NUGET_API_KEY}} --source https://api.nuget.org/v3/index.json
